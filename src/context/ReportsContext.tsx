@@ -12,68 +12,37 @@ const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'localfix_reports';
 
-// Demo reports for initial state
-const demoReports: Report[] = [
-  {
-    id: '1',
-    title: 'Large pothole on Main Street',
-    description: 'There is a dangerous pothole near the intersection that has been growing for weeks. Several cars have already been damaged.',
-    category: 'pothole',
-    location: '123 Main Street, Downtown',
-    status: 'in_progress',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '2',
-    title: 'Streetlight out on Oak Avenue',
-    description: 'The streetlight on the corner has been out for over a week making it dangerous to walk at night.',
-    category: 'streetlight',
-    location: '456 Oak Avenue',
-    status: 'resolved',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '3',
-    title: 'Overflowing garbage bins at park',
-    description: 'The garbage bins at Central Park have not been emptied in days and are overflowing onto the ground.',
-    category: 'garbage',
-    location: 'Central Park, East Entrance',
-    status: 'pending',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-  },
-];
-
 export function ReportsProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<Report[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load reports from localStorage on mount
+  // Load reports from localStorage on mount - start with empty array
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      // Convert date strings back to Date objects
-      const reportsWithDates = parsed.map((r: any) => ({
-        ...r,
-        createdAt: new Date(r.createdAt),
-        updatedAt: new Date(r.updatedAt),
-      }));
-      setReports(reportsWithDates);
-    } else {
-      // Initialize with demo reports
-      setReports(demoReports);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(demoReports));
+      try {
+        const parsed = JSON.parse(stored);
+        // Convert date strings back to Date objects
+        const reportsWithDates = parsed.map((r: any) => ({
+          ...r,
+          createdAt: new Date(r.createdAt),
+          updatedAt: new Date(r.updatedAt),
+        }));
+        setReports(reportsWithDates);
+      } catch {
+        // If parsing fails, start with empty array
+        setReports([]);
+      }
     }
+    setIsLoaded(true);
   }, []);
 
-  // Save to localStorage whenever reports change
+  // Save to localStorage whenever reports change (only after initial load)
   useEffect(() => {
-    if (reports.length > 0) {
+    if (isLoaded) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
     }
-  }, [reports]);
+  }, [reports, isLoaded]);
 
   const addReport = (reportData: Omit<Report, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => {
     const newReport: Report = {
