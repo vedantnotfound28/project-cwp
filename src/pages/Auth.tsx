@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -35,9 +35,11 @@ const InstagramIcon = () => (
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { login, signup, user } = useAuth();
   const { toast } = useToast();
   
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'signup' ? 'signup' : 'login');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,6 +54,21 @@ export default function Auth() {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  // Update tab based on URL params
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'signup') {
+      setActiveTab('signup');
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +172,7 @@ export default function Auth() {
           </div>
 
           <Card className="shadow-card">
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <CardHeader className="pb-4">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Sign In</TabsTrigger>
@@ -221,13 +238,13 @@ export default function Auth() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
-                    <Button variant="social" onClick={() => handleSocialLogin('Google')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Google')}>
                       <GoogleIcon />
                     </Button>
-                    <Button variant="social" onClick={() => handleSocialLogin('Twitter')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Twitter')}>
                       <TwitterIcon />
                     </Button>
-                    <Button variant="social" onClick={() => handleSocialLogin('Instagram')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Instagram')}>
                       <InstagramIcon />
                     </Button>
                   </div>
@@ -259,7 +276,7 @@ export default function Auth() {
                         <Input
                           id="signup-phone"
                           type="tel"
-                          placeholder="+1 (555) 000-0000"
+                          placeholder="+91 98765 43210"
                           value={signupPhone}
                           onChange={(e) => setSignupPhone(e.target.value)}
                           className="pl-10"
@@ -345,13 +362,13 @@ export default function Auth() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
-                    <Button variant="social" onClick={() => handleSocialLogin('Google')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Google')}>
                       <GoogleIcon />
                     </Button>
-                    <Button variant="social" onClick={() => handleSocialLogin('Twitter')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Twitter')}>
                       <TwitterIcon />
                     </Button>
-                    <Button variant="social" onClick={() => handleSocialLogin('Instagram')}>
+                    <Button type="button" variant="outline" onClick={() => handleSocialLogin('Instagram')}>
                       <InstagramIcon />
                     </Button>
                   </div>
@@ -362,6 +379,11 @@ export default function Auth() {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             By continuing, you agree to our Terms of Service and Privacy Policy.
+          </p>
+
+          {/* Admin hint */}
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            Admin access: admin@localfix.com
           </p>
         </div>
       </div>

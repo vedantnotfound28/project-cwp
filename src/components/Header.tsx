@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { MapPin, LogOut, User, Menu, X } from 'lucide-react';
+import { MapPin, LogOut, User, Menu, X, FileText, Info, Sparkles, LogIn, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 
 export function Header() {
@@ -31,6 +31,22 @@ export function Header() {
               Home
             </Button>
           </Link>
+          <Link to="/#about">
+            <Button 
+              variant="ghost" 
+              size="sm"
+            >
+              About
+            </Button>
+          </Link>
+          <Link to="/#features">
+            <Button 
+              variant="ghost" 
+              size="sm"
+            >
+              Features
+            </Button>
+          </Link>
           <Link to="/reports">
             <Button 
               variant={isActive('/reports') ? 'secondary' : 'ghost'} 
@@ -39,13 +55,15 @@ export function Header() {
               View Reports
             </Button>
           </Link>
+          {/* Report Problem - Only visible to logged-in users */}
           {user && (
             <Link to="/submit">
               <Button 
                 variant={isActive('/submit') ? 'secondary' : 'ghost'} 
                 size="sm"
               >
-                Submit Report
+                <FileText className="h-4 w-4 mr-1" />
+                Report Problem
               </Button>
             </Link>
           )}
@@ -58,15 +76,31 @@ export function Header() {
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">{user.name}</span>
+                {user.isAdmin && (
+                  <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+                    Admin
+                  </span>
+                )}
               </div>
               <Button variant="ghost" size="sm" onClick={logout}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
           ) : (
-            <Link to="/auth">
-              <Button size="sm">Sign In</Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/auth">
+                <Button variant="ghost" size="sm">
+                  <LogIn className="h-4 w-4 mr-1" />
+                  Login
+                </Button>
+              </Link>
+              <Link to="/auth?tab=signup">
+                <Button size="sm">
+                  <UserPlus className="h-4 w-4 mr-1" />
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
@@ -93,6 +127,24 @@ export function Header() {
                 Home
               </Button>
             </Link>
+            <Link to="/#about" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost"
+                className="w-full justify-start"
+              >
+                <Info className="h-4 w-4 mr-2" />
+                About
+              </Button>
+            </Link>
+            <Link to="/#features" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost"
+                className="w-full justify-start"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Features
+              </Button>
+            </Link>
             <Link to="/reports" onClick={() => setMobileMenuOpen(false)}>
               <Button 
                 variant={isActive('/reports') ? 'secondary' : 'ghost'} 
@@ -101,13 +153,15 @@ export function Header() {
                 View Reports
               </Button>
             </Link>
+            {/* Report Problem - Only visible to logged-in users */}
             {user && (
               <Link to="/submit" onClick={() => setMobileMenuOpen(false)}>
                 <Button 
                   variant={isActive('/submit') ? 'secondary' : 'ghost'} 
                   className="w-full justify-start"
                 >
-                  Submit Report
+                  <FileText className="h-4 w-4 mr-2" />
+                  Report Problem
                 </Button>
               </Link>
             )}
@@ -117,6 +171,11 @@ export function Header() {
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">{user.name}</span>
+                    {user.isAdmin && (
+                      <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+                        Admin
+                      </span>
+                    )}
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => { logout(); setMobileMenuOpen(false); }}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -124,9 +183,20 @@ export function Header() {
                   </Button>
                 </div>
               ) : (
-                <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full">Sign In</Button>
-                </Link>
+                <div className="flex flex-col gap-2">
+                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/auth?tab=signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </nav>

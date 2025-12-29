@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
-import { MapPin, FileText, Users, CheckCircle, ArrowRight, Leaf } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { MapPin, FileText, Users, CheckCircle, ArrowRight, Leaf, LogIn, Eye } from 'lucide-react';
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -29,16 +32,25 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submit">
-                <Button variant="hero" size="xl" className="w-full sm:w-auto">
-                  <FileText className="h-5 w-5" />
-                  Report a Problem
-                </Button>
-              </Link>
+              {user ? (
+                <Link to="/submit">
+                  <Button variant="hero" size="xl" className="w-full sm:w-auto">
+                    <FileText className="h-5 w-5" />
+                    Report a Problem
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="hero" size="xl" className="w-full sm:w-auto">
+                    <LogIn className="h-5 w-5" />
+                    Login to Report
+                  </Button>
+                </Link>
+              )}
               <Link to="/reports">
                 <Button variant="outline" size="xl" className="w-full sm:w-auto">
+                  <Eye className="h-5 w-5" />
                   View Reports
-                  <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
@@ -46,8 +58,39 @@ const Index = () => {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-20 bg-card border-y border-border">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              About LocalFix
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              LocalFix is a community-driven platform that empowers citizens of Pune and PCMC to report civic issues 
+              directly to local authorities. Our mission is to create cleaner, safer, and more livable neighborhoods 
+              by bridging the gap between residents and municipal services.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-primary mb-2">100%</div>
+              <p className="text-muted-foreground">Free to Use</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-primary mb-2">24/7</div>
+              <p className="text-muted-foreground">Report Anytime</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-primary mb-2">Pune</div>
+              <p className="text-muted-foreground">& PCMC Coverage</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-20 bg-card border-y border-border">
+      <section id="features" className="py-20">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
@@ -59,7 +102,7 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 rounded-2xl bg-background border border-border animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="text-center p-6 rounded-2xl bg-card border border-border animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl gradient-hero mb-5">
                 <MapPin className="h-7 w-7 text-primary-foreground" />
               </div>
@@ -71,7 +114,7 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="text-center p-6 rounded-2xl bg-background border border-border animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="text-center p-6 rounded-2xl bg-card border border-border animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl gradient-hero mb-5">
                 <FileText className="h-7 w-7 text-primary-foreground" />
               </div>
@@ -83,7 +126,7 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="text-center p-6 rounded-2xl bg-background border border-border animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <div className="text-center p-6 rounded-2xl bg-card border border-border animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl gradient-hero mb-5">
                 <CheckCircle className="h-7 w-7 text-primary-foreground" />
               </div>
@@ -99,7 +142,7 @@ const Index = () => {
       </section>
 
       {/* Categories Preview */}
-      <section className="py-20">
+      <section className="py-20 bg-card border-y border-border">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
@@ -123,7 +166,7 @@ const Index = () => {
             ].map((item, index) => (
               <div
                 key={item.label}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-card transition-all duration-200 animate-scale-in"
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background border border-border hover:border-primary/30 hover:shadow-card transition-all duration-200 animate-scale-in"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <span className="text-3xl">{item.icon}</span>
@@ -135,7 +178,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-card border-t border-border">
+      <section className="py-20">
         <div className="container">
           <div className="max-w-2xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-6">
@@ -148,14 +191,26 @@ const Index = () => {
               Ready to make a difference?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Create an account to start reporting issues and tracking their resolution.
+              {user 
+                ? "You're all set! Start reporting issues in your neighborhood."
+                : "Create an account to start reporting issues and tracking their resolution."
+              }
             </p>
-            <Link to="/auth">
-              <Button variant="hero" size="lg">
-                Get Started
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/submit">
+                <Button variant="hero" size="lg">
+                  Report a Problem
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button variant="hero" size="lg">
+                  Get Started
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -171,7 +226,7 @@ const Index = () => {
               <span className="font-semibold text-foreground">LocalFix</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 LocalFix. Making communities better, one report at a time.
+              © 2024 LocalFix. Making Pune & PCMC better, one report at a time.
             </p>
           </div>
         </div>

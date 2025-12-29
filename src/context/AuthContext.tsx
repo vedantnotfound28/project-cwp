@@ -5,6 +5,7 @@ interface User {
   email: string;
   name: string;
   phone?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -26,6 +27,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERS_KEY = 'localfix_users';
 const CURRENT_USER_KEY = 'localfix_current_user';
+
+// Admin email - only this user can update report status
+const ADMIN_EMAIL = 'admin@localfix.com';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -57,8 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: false, error: 'Incorrect password' };
     }
 
-    setUser(userRecord.user);
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userRecord.user));
+    // Check if admin
+    const userWithAdmin = {
+      ...userRecord.user,
+      isAdmin: email.toLowerCase() === ADMIN_EMAIL,
+    };
+
+    setUser(userWithAdmin);
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userWithAdmin));
     return { success: true };
   };
 
@@ -74,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: data.email,
       name: data.name,
       phone: data.phone,
+      isAdmin: data.email.toLowerCase() === ADMIN_EMAIL,
     };
 
     users[data.email.toLowerCase()] = {
