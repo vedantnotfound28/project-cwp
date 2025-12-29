@@ -17,20 +17,27 @@ export function ReportsProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load reports from localStorage on mount - start with empty array
+  // Clear any old demo/sample data on fresh load
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        // Convert date strings back to Date objects
-        const reportsWithDates = parsed.map((r: any) => ({
-          ...r,
-          createdAt: new Date(r.createdAt),
-          updatedAt: new Date(r.updatedAt),
-        }));
-        setReports(reportsWithDates);
+        // Only load if valid array with real user-submitted reports
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Convert date strings back to Date objects
+          const reportsWithDates = parsed.map((r: any) => ({
+            ...r,
+            createdAt: new Date(r.createdAt),
+            updatedAt: new Date(r.updatedAt),
+          }));
+          setReports(reportsWithDates);
+        } else {
+          setReports([]);
+        }
       } catch {
         // If parsing fails, start with empty array
+        localStorage.removeItem(STORAGE_KEY);
         setReports([]);
       }
     }
