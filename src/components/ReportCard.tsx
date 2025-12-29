@@ -2,7 +2,7 @@ import { Report, getCategoryInfo } from '@/types/report';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, Clock } from 'lucide-react';
+import { MapPin, Calendar, Clock, Shield } from 'lucide-react';
 import { useReports } from '@/context/ReportsContext';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -59,6 +59,9 @@ export function ReportCard({ report }: ReportCardProps) {
     }
   };
 
+  // Only admin can update status
+  const canUpdateStatus = user?.isAdmin === true;
+
   return (
     <Card className="overflow-hidden shadow-card hover:shadow-lg transition-all duration-300 animate-scale-in">
       {report.imageUrl && (
@@ -110,11 +113,13 @@ export function ReportCard({ report }: ReportCardProps) {
           </div>
         </div>
 
-        {user && (
+        {/* Only admin can update status */}
+        {canUpdateStatus && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="w-full">
-                Update Status
+                <Shield className="h-4 w-4 mr-2" />
+                Update Status (Admin)
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

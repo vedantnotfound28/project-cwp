@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Navigation, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -9,11 +9,132 @@ interface LocationPickerProps {
   onChange: (location: string, lat?: number, lng?: number) => void;
 }
 
+// Pune and PCMC bounding box coordinates
+const PUNE_PCMC_BOUNDS = {
+  minLat: 18.3,
+  maxLat: 18.8,
+  minLng: 73.7,
+  maxLng: 74.1,
+};
+
+// Allowed location keywords
+const ALLOWED_KEYWORDS = [
+  'pune',
+  'pcmc',
+  'pimpri',
+  'chinchwad',
+  'nigdi',
+  'akurdi',
+  'bhosari',
+  'kothrud',
+  'wakad',
+  'hinjewadi',
+  'baner',
+  'pashan',
+  'aundh',
+  'shivajinagar',
+  'deccan',
+  'swargate',
+  'hadapsar',
+  'magarpatta',
+  'kharadi',
+  'viman nagar',
+  'koregaon',
+  'yerawada',
+  'wagholi',
+  'manjri',
+  'mundhwa',
+  'kondhwa',
+  'katraj',
+  'bibvewadi',
+  'warje',
+  'karve',
+  'paud',
+  'bavdhan',
+  'sus',
+  'mulshi',
+  'lavasa',
+  'talegaon',
+  'lonavala',
+  'dehu',
+  'alandi',
+  'chakan',
+  'rajgurunagar',
+  'sangvi',
+  'dapodi',
+  'kasarwadi',
+  'phugewadi',
+  'moshi',
+  'dighi',
+  'talawade',
+];
+
 export function LocationPicker({ value, onChange }: LocationPickerProps) {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const isLocationInPunePCMC = (lat: number, lng: number): boolean => {
+    return (
+      lat >= PUNE_PCMC_BOUNDS.minLat &&
+      lat <= PUNE_PCMC_BOUNDS.maxLat &&
+      lng >= PUNE_PCMC_BOUNDS.minLng &&
+      lng <= PUNE_PCMC_BOUNDS.maxLng
+    );
+  };
+
+  const isAddressInPunePCMC = (address: string): boolean => {
+    const lowerAddress = address.toLowerCase();
+    return ALLOWED_KEYWORDS.some(keyword => lowerAddress.includes(keyword));
+  };
+
+  const validateAndSetLocation = (address: string, lat?: number, lng?: number) => {
+    // Check coordinates if available
+    if (lat !== undefined && lng !== undefined) {
+      if (!isLocationInPunePCMC(lat, lng)) {
+        setLocationError('Location must be within Pune or PCMC area');
+        setCoords(null);
+        onChange('');
+        toast({
+          title: "Invalid Location",
+          description: "Reports can only be submitted for locations within Pune and PCMC.",
+          variant: "destructive",
+        });
+        return false;
+      }
+    }
+
+    // Also validate address text
+    if (address && !isAddressInPunePCMC(address)) {
+      setLocationError('Please enter a location within Pune or PCMC');
+      return false;
+    }
+
+    setLocationError(null);
+    if (lat !== undefined && lng !== undefined) {
+      setCoords({ lat, lng });
+    }
+    onChange(address, lat, lng);
+    return true;
+  };
+
+  const handleManualInput = (address: string) => {
+    if (!address) {
+      setLocationError(null);
+      setCoords(null);
+      onChange('');
+      return;
+    }
+
+    // Just update the value, validation happens on form submit
+    if (isAddressInPunePCMC(address)) {
+      setLocationError(null);
+    } else if (address.length > 5) {
+      setLocationError('Location must be within Pune or PCMC area');
+    }
+    onChange(address);
+  };
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -26,11 +147,24 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     }
 
     setIsGettingLocation(true);
+    setLocationError(null);
+    
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        setCoords({ lat: latitude, lng: longitude });
         
+        // Check if location is within Pune/PCMC bounds
+        if (!isLocationInPunePCMC(latitude, longitude)) {
+          setIsGettingLocation(false);
+          setLocationError('Your current location is outside Pune/PCMC area');
+          toast({
+            title: "Location Outside Service Area",
+            description: "LocalFix currently only accepts reports from Pune and PCMC areas.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Try to get address from coordinates using reverse geocoding
         try {
           const response = await fetch(
@@ -38,17 +172,23 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           );
           const data = await response.json();
           const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          
+          setCoords({ lat: latitude, lng: longitude });
           onChange(address, latitude, longitude);
+          setLocationError(null);
+          
+          toast({
+            title: "Location detected",
+            description: "Your current location in Pune/PCMC has been added",
+          });
         } catch {
           // Fallback to coordinates if reverse geocoding fails
+          setCoords({ lat: latitude, lng: longitude });
           onChange(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`, latitude, longitude);
+          setLocationError(null);
         }
         
         setIsGettingLocation(false);
-        toast({
-          title: "Location detected",
-          description: "Your current location has been added",
-        });
       },
       (error) => {
         setIsGettingLocation(false);
@@ -69,9 +209,9 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Enter address or use current location"
-            className="pl-10"
+            onChange={(e) => handleManualInput(e.target.value)}
+            placeholder="Enter location in Pune or PCMC"
+            className={`pl-10 ${locationError ? 'border-destructive' : ''}`}
           />
         </div>
         <Button
@@ -92,6 +232,17 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </Button>
       </div>
 
+      {locationError && (
+        <div className="flex items-center gap-2 text-sm text-destructive">
+          <AlertCircle className="h-4 w-4" />
+          <span>{locationError}</span>
+        </div>
+      )}
+
+      <p className="text-xs text-muted-foreground">
+        📍 Service area: Pune and PCMC only
+      </p>
+
       {coords && (
         <div className="rounded-xl overflow-hidden border border-border bg-muted">
           <iframe
@@ -105,7 +256,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         </div>
       )}
       
-      {!coords && value && (
+      {!coords && value && !locationError && (
         <div className="rounded-xl overflow-hidden border border-border bg-muted">
           <iframe
             width="100%"
