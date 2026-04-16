@@ -63,10 +63,10 @@ const Index = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              About LocalFix
+              About RuralFix
             </h2>
             <p className="text-muted-foreground text-lg">
-              LocalFix is a community-driven platform that empowers citizens of Pune and PCMC to report civic issues 
+              RuralFix is a community-driven platform that empowers citizens of India to report civic issues 
               directly to local authorities. Our mission is to create cleaner, safer, and more livable neighborhoods 
               by bridging the gap between residents and municipal services.
             </p>
@@ -82,8 +82,8 @@ const Index = () => {
               <p className="text-muted-foreground">Report Anytime</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">Pune</div>
-              <p className="text-muted-foreground">& PCMC Coverage</p>
+              <div className="text-4xl font-bold text-primary mb-2">India</div>
+              <p className="text-muted-foreground"></p>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ const Index = () => {
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              How LocalFix Works
+              How RuralFix Works
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Three simple steps to report and track civic issues in your area
@@ -223,10 +223,10 @@ const Index = () => {
               <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                 <MapPin className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-foreground">LocalFix</span>
+              <span className="font-semibold text-foreground">RuralFix</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 LocalFix. Making Pune & PCMC better, one report at a time.
+             
             </p>
           </div>
         </div>

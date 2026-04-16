@@ -18,7 +18,7 @@ export function Header() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
             <MapPin className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-foreground">LocalFix</span>
+          <span className="text-xl font-bold text-foreground">RuralFix</span>
         </Link>
 
         {/* Desktop Navigation */}
