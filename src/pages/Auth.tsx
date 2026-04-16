@@ -167,7 +167,7 @@ export default function Auth() {
               <div className="h-10 w-10 rounded-xl gradient-hero flex items-center justify-center">
                 <MapPin className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold text-foreground">LocalFix</span>
+              <span className="text-2xl font-bold text-foreground">RuralFix</span>
             </div>
           </div>
 
@@ -383,7 +383,7 @@ export default function Auth() {
 
           {/* Admin hint */}
           <p className="text-center text-xs text-muted-foreground mt-4">
-            Admin access: admin@localfix.com
+            Admin access: admin@ruralfix.com
           </p>
         </div>
       </div>
