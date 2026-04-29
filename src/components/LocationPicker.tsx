@@ -93,12 +93,12 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     // Check coordinates if available
     if (lat !== undefined && lng !== undefined) {
       if (!isLocationInPunePCMC(lat, lng)) {
-        setLocationError('Location must be within Pune or PCMC area');
+        setLocationError('Location must be within India');
         setCoords(null);
         onChange('');
         toast({
           title: "Invalid Location",
-          description: "Reports can only be submitted for locations within Pune and PCMC.",
+          description: "Reports can only be submitted for locations within India.",
           variant: "destructive",
         });
         return false;
@@ -107,7 +107,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
 
     // Also validate address text
     if (address && !isAddressInPunePCMC(address)) {
-      setLocationError('Please enter a location within Pune or PCMC');
+      setLocationError('Please enter a location ');
       return false;
     }
 
@@ -131,7 +131,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
     if (isAddressInPunePCMC(address)) {
       setLocationError(null);
     } else if (address.length > 5) {
-      setLocationError('Location must be within Pune or PCMC area');
+      setLocationError('Location must be within India');
     }
     onChange(address);
   };
@@ -156,10 +156,10 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         // Check if location is within Pune/PCMC bounds
         if (!isLocationInPunePCMC(latitude, longitude)) {
           setIsGettingLocation(false);
-          setLocationError('Your current location is outside Pune/PCMC area');
+          setLocationError('Your current location ');
           toast({
             title: "Location Outside Service Area",
-            description: "LocalFix currently only accepts reports from Pune and PCMC areas.",
+            description: "RuralFix Accept location all over India.",
             variant: "destructive",
           });
           return;
@@ -179,7 +179,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           
           toast({
             title: "Location detected",
-            description: "Your current location in Pune/PCMC has been added",
+            description: "Your current location has been added",
           });
         } catch {
           // Fallback to coordinates if reverse geocoding fails
@@ -210,7 +210,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           <Input
             value={value}
             onChange={(e) => handleManualInput(e.target.value)}
-            placeholder="Enter location in Pune or PCMC"
+            placeholder="Enter location "
             className={`pl-10 ${locationError ? 'border-destructive' : ''}`}
           />
         </div>
@@ -240,7 +240,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       )}
 
       <p className="text-xs text-muted-foreground">
-        📍 Service area: Pune and PCMC only
+        📍 Service area: all over India
       </p>
 
       {coords && (
